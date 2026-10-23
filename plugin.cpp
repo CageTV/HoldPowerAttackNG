@@ -228,7 +228,11 @@ void PlayDebugSound(BGSSoundDescriptorForm* sound, PlayerCharacter* player) {
     }
 
     BSSoundHandle handle;
+#ifdef HPA_NG
+    audioManager->GetSoundHandle(handle, sound->soundDescriptor);  // the same function, renamed in alandtse's CommonLibSSE-NG
+#else
     audioManager->BuildSoundDataFromDescriptor(handle, sound->soundDescriptor);
+#endif
     handle.SetVolume(1.0f);
     handle.SetObjectToFollow(player->Get3D());
     handle.Play();
@@ -490,12 +494,15 @@ public:
     }
 
     static void Hook() {
+        // AE 1.7.99 added two virtuals after PlayerInputHandler::CanProcess, which moved ProcessButton from slot 4 to 6
+        const std::size_t slot = (!REL::Module::IsVR() && REL::Module::get().version() >= REL::Version(1, 7, 0, 0)) ? 6 : 4;
+
         REL::Relocation<uintptr_t> vtable{VTABLE_AttackBlockHandler[0]};
         FnProcessButton fn =
-            stl::unrestricted_cast<FnProcessButton>(vtable.write_vfunc(4, &HookAttackBlockHandler::ProcessButton));
+            stl::unrestricted_cast<FnProcessButton>(vtable.write_vfunc(slot, &HookAttackBlockHandler::ProcessButton));
         fnHash.insert(std::pair<uintptr_t, FnProcessButton>(vtable.address(), fn));
 
-        logger::info("Hooked Attack System OK...");
+        logger::info("Hooked Attack System OK (AttackBlockHandler::ProcessButton at vfunc slot {})...", slot);
     }
 
 private:

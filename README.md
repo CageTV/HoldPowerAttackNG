@@ -5,6 +5,10 @@ A simple C++ Skyrim SE/AE plugin using [CommonLibSSE NG](https://github.com/Char
 ### Release
 [Nexus Mods](https://www.nexusmods.com/skyrimspecialedition/mods/106623/)
 
+### Skyrim 1.7.x
+
+AE 1.7.99 / 1.7.104 added two virtual functions to the input handlers, which moved `AttackBlockHandler::ProcessButton` from vtable slot 4 to 6. The plugin picks the slot at runtime. `ng.cmake` builds the same source on [alandtse's CommonLibSSE-NG](https://github.com/alandtse/CommonLibVR/tree/ng) for Skyrim 1.6.1170 and 1.7.x; `CMakeLists.txt` is the older build for VR and 1.6.1130 and older.
+
 ### Gamepad buttons ids:
 - DPad UP: 266
 - DPad DOWN: 267
